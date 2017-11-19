@@ -54,8 +54,8 @@ class plugin_subcategories extends plugin_base{
             if (preg_match("/%%FILTER_SUBCATEGORIES:([^%]+)%%/i", $finalelements, $output)) {
                 $replace = ' AND ('.$output[1].' LIKE CONCAT( \'%/\', '.$filter_subcategories.') OR '.$output[1].' LIKE CONCAT( \'%/\', '.$filter_subcategories.', \'/%\') ) ';
                 $finalelements = str_replace('%%FILTER_SUBCATEGORIES:'.$output[1].'%%', $replace, $finalelements);
-            }
-        }
+			}
+		}
 		return $finalelements;
 	}
 

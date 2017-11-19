@@ -80,7 +80,7 @@ class plugin_courses extends plugin_base{
 			$courses = $remoteDB->get_records_select('course',"id $usql",$params);
 
 			foreach($courses as $c){
-				$courseoptions[$c->id] = format_string($c->shortname);
+				$courseoptions[$c->id] = format_string($c->fullname);
 			}
 		}
 

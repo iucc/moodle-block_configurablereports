@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 $string['blockname'] = "Vlastné správy";
 $string['report_courses'] = "Správy kurzov";

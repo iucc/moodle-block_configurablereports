@@ -58,12 +58,6 @@ $string['subreport'] = 'Sub Report';
 $string['subreport_help'] = 'This is a sub-report, and it will not be visible to Teachers on the report list, but can be invoked by another report. (Using the Alias or Report ID)';
 $string['alias'] = 'Unique English Alias';
 $string['alias_help'] = 'A unique English alias that is used by other reports to invoke this report + pass initial parameters to run the report properly.';
-$string['tags'] = 'TAGs<br>(divided by comma)';
-$string['tagstitle'] = 'TAGs';
-$string['tags_help'] = 'TAGs are used to manage reports. TAGs are divided by a comma char.';
-$string['contexttagstitle'] = 'Context TAGs';
-$string['contexttags'] = 'Context TAGs<br>(divided by comma)';
-$string['contexttags_help'] = 'Context TAGs are used to manage reports. TAGs are divided by a comma char.';
 
 // Columns
 $string['column'] = "Column";
@@ -136,6 +130,8 @@ $string['filtermycourses_summary'] = "This filter shows a list of courses, where
 
 $string['addfiltersorfullreport'] = '<div style="font-size: 18px;" >You can use the above filters <br/>or...<br/> click the following "Display full report" button.</div>';
 $string['displayfullreport'] = 'Display full report';
+
+$string['fsearchuserfield'] = 'Filter search field';
 
 // Calcs
 $string['nocalcsyet'] = "No calculations yet";
@@ -442,9 +438,8 @@ $string['email_subject'] = 'Subject';
 $string['email_message'] = 'Message';
 $string['email_send'] = 'Send';
 $string['sendemails'] = 'Send eMails';
-
+$string ['gmul']  = 'gmul';
 $string['configurable_reports:myaddinstance'] = 'Add a new configurable_reports block to My home';
-
 // Events
 $string['eventreportviewed'] = 'Report viewed';
 $string['eventreportedited'] = 'Report edited';
@@ -453,7 +448,3 @@ $string['eventreportdeleted'] = 'Report deleted';
 $string['eventreportduplicated'] = 'Report duplicated';
 $string['eventreportshowed'] = 'Report showed';
 $string['eventreporthidden'] = 'Report hidden';
-
-$string['scheduledqueries'] = 'Scheduled queries for configurable reports';
-$string['coursereports'] = 'Course reports';
-$string['systemreports'] = 'System (shared) reports';

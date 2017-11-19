@@ -51,11 +51,10 @@ class puserfield_form extends moodleform {
 		unset($usercolumns['secret']);
 			
         $mform->addElement('select', 'field', get_string('column','block_configurable_reports'), $usercolumns);
-		
-		$mform->addElement('text','value',get_string('value','block_configurable_reports'));		
-		
+		$mform->addElement('text','value',get_string('value','block_configurable_reports'));
 		$mform->addRule('value',get_string('required'),'required');
-		
+        $mform->setType('value', PARAM_RAW);
+
         // buttons
         $this->add_action_buttons(true, get_string('add'));
 

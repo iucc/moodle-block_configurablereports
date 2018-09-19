@@ -32,9 +32,7 @@ class component_customsql extends component_base {
         $this->help = true;
 
         if (get_config('block_configurable_reports', 'sqlsyntaxhighlight')) {
-            $PAGE->requires->js('/blocks/configurable_reports/js/codemirror/lib/codemirror.js');
             $PAGE->requires->js('/blocks/configurable_reports/js/codemirror/mode/sql/sql.js');
-            $PAGE->requires->js('/blocks/configurable_reports/js/codemirror/addon/display/fullscreen.js');
             $PAGE->requires->js('/blocks/configurable_reports/js/codemirror/addon/edit/matchbrackets.js');
         }
 
@@ -55,9 +53,10 @@ class component_customsql extends component_base {
 
     public function form_set_data(&$cform) {
         if ($this->form) {
-            $fdata = new stdclass;
+            $fdata = new stdClass;
             $components = cr_unserialize($this->config->components);
             $sqlconfig = (isset($components['customsql']['config'])) ? $components['customsql']['config'] : new stdclass;
+            unset($sqlconfig->courseid);
             $cform->set_data($sqlconfig);
         }
     }

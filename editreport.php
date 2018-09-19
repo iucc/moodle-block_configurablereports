@@ -115,7 +115,12 @@ if (($show || $hide) && confirm_sesskey()) {
         print_error('cannotupdatereport', 'block_configurable_reports');
     }
     $action = ($visible) ? 'showed' : 'hidden';
-    cr_add_to_log($report->courseid, 'configurable_reports', 'report '.$action, '/block/configurable_reports/editreport.php?id='.$report->id, $report->id);
+    //cr_add_to_log($report->courseid, 'configurable_reports', 'report '.$action, '/block/configurable_reports/editreport.php?id='.$report->id, $report->id);
+    if ($action == 'showed')
+        \block_configurable_reports\event\report_showed::create_from_report($report, context_course::instance($course->id))->trigger();
+    if ($action == 'hidden')
+        \block_configurable_reports\event\report_hidden::create_from_report($report, context_course::instance($course->id))->trigger();
+
     header("Location: $CFG->wwwroot/blocks/configurable_reports/managereport.php?courseid=$courseid");
     die;
 }
@@ -129,7 +134,9 @@ if ($duplicate && confirm_sesskey()) {
     if (!$newreportid = $DB->insert_record('block_configurable_reports', $newreport)) {
         print_error('cannotduplicate', 'block_configurable_reports');
     }
-    cr_add_to_log($newreport->courseid, 'configurable_reports', 'report duplicated', '/block/configurable_reports/editreport.php?id='.$newreportid, $id);
+    //cr_add_to_log($newreport->courseid, 'configurable_reports', 'report duplicated', '/block/configurable_reports/editreport.php?id='.$newreportid, $id);
+    \block_configurable_reports\event\report_deleted::create_from_report($newreportid, context_course::instance($course->id))->trigger();
+
     header("Location: $CFG->wwwroot/blocks/configurable_reports/managereport.php?courseid=$courseid");
     die;
 }
@@ -150,19 +157,54 @@ if ($delete && confirm_sesskey()) {
         exit;
     } else {
         if ($DB->delete_records('block_configurable_reports', ['id' => $report->id])) {
-            cr_add_to_log($report->courseid, 'configurable_reports', 'report deleted', '/block/configurable_reports/editreport.php?id='.$report->id, $report->id);
+            //cr_add_to_log($report->courseid, 'configurable_reports', 'report deleted', '/block/configurable_reports/editreport.php?id='.$report->id, $report->id);
+            \block_configurable_reports\event\report_deleted::create_from_report($report, context_course::instance($course->id))->trigger();
         }
         header("Location: $CFG->wwwroot/blocks/configurable_reports/managereport.php?courseid=$courseid");
         die;
     }
 }
 
+// CodeMirror main library.
+$PAGE->requires->js('/blocks/configurable_reports/js/codemirror/lib/codemirror.js');
+$PAGE->requires->css('/blocks/configurable_reports/js/codemirror/lib/codemirror.css');
+// Loading extra CodeMirror plugins, on demand.
+$PAGE->requires->js('/blocks/configurable_reports/js/codemirror/mode/javascript/javascript.js');
+$PAGE->requires->js('/blocks/configurable_reports/js/codemirror/addon/edit/matchbrackets.js');
+$PAGE->requires->js('/blocks/configurable_reports/js/codemirror/addon/display/fullscreen.js');
+$PAGE->requires->css('/blocks/configurable_reports/js/codemirror/addon/display/fullscreen.css');
+if (get_config('block_configurable_reports', 'sqlsearchnreplace') === '1') {
+    $PAGE->requires->js('/blocks/configurable_reports/js/codemirror/addon/dialog/dialog.js');
+    $PAGE->requires->css('/blocks/configurable_reports/js/codemirror/addon/dialog/dialog.css');
+    $PAGE->requires->js('/blocks/configurable_reports/js/codemirror/addon/search/search.js');
+    $PAGE->requires->js('/blocks/configurable_reports/js/codemirror/addon/search/searchcursor.js');
+}
+// Initiate CodeMirror.
+$PAGE->requires->js('/blocks/configurable_reports/js/configurable_reports.js');
+
+// Get data ready for mform.
+$eventlist = tool_monitor\eventlist::get_all_eventlist(true);
+$pluginlist = tool_monitor\eventlist::get_plugin_list();
+
+// Filter out events which cannot be triggered for some reason.
+//$eventlist = array_filter($eventlist, function($classname) {
+//    return !$classname::is_deprecated();
+//}, ARRAY_FILTER_USE_KEY);
+// Modify the lists to add the choosers.
+$eventlist = array_merge(array('' => get_string('choosedots')), $eventlist);
+$pluginlist = array_merge(array('' => get_string('choosedots')), $pluginlist);
+// Set up the yui module.
+$PAGE->requires->yui_module('moodle-tool_monitor-dropdown', 'Y.M.tool_monitor.DropDown.init',
+    array(array('eventlist' => $eventlist)));
+
 require_once('editreport_form.php');
 
 if (!empty($report)) {
-    $editform = new report_edit_form('editreport.php', compact('report', 'courseid', 'context'));
+    $editform = new report_edit_form('editreport.php', array('report'=> $report, 'courseid' => $courseid,
+        'context' => $context, 'eventlist' => $eventlist, 'pluginlist' => $pluginlist));
 } else {
-    $editform = new report_edit_form('editreport.php', compact('courseid', 'context'));
+    $editform = new report_edit_form('editreport.php', array('courseid' => $courseid, 'context' => $context,
+        'eventlist' => $eventlist, 'pluginlist' => $pluginlist));
 }
 
 if (!empty($report)) {
@@ -228,12 +270,16 @@ if ($editform->is_cancelled()) {
         if (!$lastid = $DB->insert_record('block_configurable_reports', $data)) {
             print_error('errorsavingreport', 'block_configurable_reports');
         } else {
-            cr_add_to_log($courseid, 'configurable_reports', 'report created', '/block/configurable_reports/editreport.php?id='.$lastid, $data->name);
+            //cr_add_to_log($courseid, 'configurable_reports', 'report created', '/block/configurable_reports/editreport.php?id='.$lastid, $data->name);
+            \block_configurable_reports\event\report_created::create_from_report($report, context_course::instance($course->id))->trigger();
+
             $reportclass = new $reportclassname($lastid);
             redirect($CFG->wwwroot.'/blocks/configurable_reports/editcomp.php?id='.$lastid.'&comp='.$reportclass->components[0]);
         }
     } else {
-        cr_add_to_log($report->courseid, 'configurable_reports', 'edit', '/block/configurable_reports/editreport.php?id='.$id, $report->name);
+        //cr_add_to_log($report->courseid, 'configurable_reports', 'edit', '/block/configurable_reports/editreport.php?id='.$id, $report->name);
+        \block_configurable_reports\event\report_edited::create_from_report($report, $context)->trigger();
+
         $reportclass = new $reportclassname($data->id);
         $data->type = $report->type;
 

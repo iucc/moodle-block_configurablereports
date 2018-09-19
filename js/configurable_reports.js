@@ -1,5 +1,6 @@
 var editor_querysql = null;
 var editor_remotequerysql = null;
+var editor_customhtml = null;
 
 M.block_configurable_reports = {
 
@@ -11,31 +12,44 @@ M.block_configurable_reports = {
 
         // Documentation can be found @ http://codemirror.net/
         editor_querysql = CodeMirror.fromTextArea(document.getElementById('id_querysql'), {
-            mode: "text/x-mysql",
+            mode: "text/x-mariadb",
             rtlMoveVisually: true,
             indentWithTabs: true,
             smartIndent: true,
             lineNumbers: true,
             matchBrackets : true,
             autofocus: true,
+            viewportMargin: Infinity,
             extraKeys: {
                 "F11": function(cm) {
                     cm.setOption("fullScreen", !cm.getOption("fullScreen"));
                 },
                 "Esc": function(cm) {
                     if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
-                }}
+                },
+                "Ctrl-Space": "autocomplete"}
             });
+        //editor_querysql.setSize("800px", null);
 
         editor_remotequerysql = CodeMirror.fromTextArea(document.getElementById('id_remotequerysql'), {
-            mode: "text/x-mysql",
+            mode: "text/x-mariadb",
             rtlMoveVisually: true,
             indentWithTabs: true,
             smartIndent: true,
             lineNumbers: true,
             matchBrackets : true,
-        //    autofocus: true
+            autofocus: false,
+            extraKeys: {
+                "F11": function(cm) {
+                    cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                },
+                "Esc": function(cm) {
+                    if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                },
+                "Ctrl-Space": "autocomplete"}
         });
+
+
 
     },
 
@@ -206,3 +220,22 @@ function menuplugin(event,args) {
     location.href = args.url+document.getElementById('menuplugin').value;
 }
 
+if (document.getElementById('id_customhtml')) {
+    editor_customhtml = CodeMirror.fromTextArea(document.getElementById('id_customhtml'), {
+        mode: "text/javascript",
+        rtlMoveVisually: true,
+        indentWithTabs: true,
+        smartIndent: true,
+        lineNumbers: true,
+        matchBrackets : true,
+        autofocus: true,
+        extraKeys: {
+            "F11": function(cm) {
+                cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+            },
+            "Esc": function(cm) {
+                if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+            },
+            "Ctrl-Space": "autocomplete"}
+    });
+}

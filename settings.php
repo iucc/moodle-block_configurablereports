@@ -32,6 +32,12 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('block_configurable_reports/sqlsecurity', get_string('sqlsecurity', 'block_configurable_reports'),
         get_string('sqlsecurityinfo', 'block_configurable_reports'), 1));
 
+    $settings->add(new admin_setting_configcheckbox('block_configurable_reports/requireprefix', get_string('requireprefix', 'block_configurable_reports'),
+        get_string('requireprefixinfo', 'block_configurable_reports'), 1));
+
+    $settings->add(new admin_setting_configcheckbox('block_configurable_reports/verticalscroll', get_string('verticalscroll', 'block_configurable_reports'),
+        get_string('verticalscrollinfo', 'block_configurable_reports'), 0));
+
     $settings->add(new admin_setting_configtext('block_configurable_reports/crrepository', get_string('crrepository', 'block_configurable_reports'),
         get_string('crrepositoryinfo', 'block_configurable_reports'), 'jleyva/moodle-configurable_reports_repository', PARAM_URL, 40));
 
@@ -39,7 +45,11 @@ if ($ADMIN->fulltree) {
         get_string('sharedsqlrepositoryinfo', 'block_configurable_reports'), 'jleyva/moodle-custom_sql_report_queries', PARAM_URL, 40));
 
     $settings->add(new admin_setting_configcheckbox('block_configurable_reports/sqlsyntaxhighlight', get_string('sqlsyntaxhighlight', 'block_configurable_reports'),
-        get_string('sqlsyntaxhighlightinfo', 'block_configurable_reports'), 0));
+        get_string('sqlsyntaxhighlightinfo', 'block_configurable_reports'), 1));
+    $settings->add(new admin_setting_configcheckbox('block_configurable_reports/sqlsearchnreplace', get_string('sqlsearchnreplace', 'block_configurable_reports'),
+        get_string('sqlsearchnreplaceinfo', 'block_configurable_reports'), 1));
+    $settings->add(new admin_setting_configcheckbox('block_configurable_reports/sqlautocomplete', get_string('sqlautocomplete', 'block_configurable_reports'),
+        get_string('sqlautocompleteinfo', 'block_configurable_reports'), 1));
 
     $reporttableoptions = array('html' => 'Simple', 'jquery' => 'jQuery', 'datatables' => 'DataTables JS');
     $settings->add(new admin_setting_configselect('block_configurable_reports/reporttableui', get_string('reporttableui', 'block_configurable_reports'),

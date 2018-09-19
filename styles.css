@@ -1,6 +1,3 @@
-@import url("../blocks/configurable_reports/js/datatables/media/css/jquery.dataTables.css");
-@import url("../blocks/configurable_reports/js/codemirror/lib/codemirror.css");
-@import url("../blocks/configurable_reports/js/codemirror/addon/display/fullscreen.css");
 
 .dir-rtl .CodeMirror {
     direction: ltr;
@@ -98,3 +95,39 @@
      position:relative;
      top:1px;
  }
+
+.FixedHeader_Cloned.fixedHeader.FixedHeader_Header table {
+    width: 100% !important;
+}
+
+.CodeMirror {
+    border: 1px solid #eee;
+    height: 300px !important;
+    width: 100%;
+}
+
+/* display after top navigation bar */
+.CodeMirror-fullscreen {
+    top: 50px !important;
+    height: auto !important;
+}
+
+.sqlhelper {
+    /*rtl:ignore*/
+    text-align: left;
+    /*rtl:ignore*/
+    direction: ltr;
+    display: block;
+}
+
+span.sqlvariablehelper {
+    /*rtl:ignore*/
+    direction: ltr;
+    /*rtl:ignore*/
+    text-align: left;
+    display: block;
+}
+
+table#reporttable {
+    width: 100% !important;
+}

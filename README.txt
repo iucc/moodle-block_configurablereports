@@ -27,6 +27,61 @@ By Tim Hunt
 
 Versions history
 
+Major updateds in version 3.5
+* Updated CodeMirror and DataTables libs
+* Report page display in "report" layout
+* Migrate cron to task scheduler (classes/task)
+* Migrate legacy log to event2 (classes/event)
+* Support external JS charts and script, on report view page (d3.js, and more...)
+* New export as JSON (to support JS charts)
+* New virtual report columns: sendemail, addtogroup
+
+
+Major updates:
+
+* Enable adding expernal JS Charing libraries, that can interact with report data.
+* Add JSON support (to support JS Charts, see above feature)
+* Reports can run on a different DB and user then the current (production) DB.
+* Reports can run on a CRON scheduler.
+* Several filter plugins added (list).
+* Several inline "SQL" special variable added (%%USERID%%, %%COURSEID%%, ...)
+* Site level report can be shared in all courses.
+* New Counterpart "report" plugin that enables a teacher to run reports from Administration->Reports block (no need to add CB block).
+* Share reports between Moodle systems - using GITHUB as a repository to distribute and manage sharable SQL queries.
+* Control report row limit
+* Move report from course level to system level ( add "&adminmode=1" to report setting page's URL and change report's courseid at the bottom of the form)
+* %%COURSEID%% can be overridden be using "&courseid=XXX" on the report's URL.
+* Hide sub-reports from the list.
+* Enable unique aliases to each report, so they can be invoked by other reports persistently across Moodle systems.
+
+New JavaScript libraries
+========================
+CodeMirror - Display highlighted SQL queries.
+DataTables - Display paged reports, enable global search on any field, Sticky headers, control row count display, more...
+
+New Filters & SQL syntax
+========================
+%%COURSEID%% and %%USERID%% and %%FILTER_VAR%%
+
+%%DEBUG%% (Add to the first line of the SQL) - Display the fully processed SQL query
+
+And Special filters (if available!):
+%%FILTER_SEARCHTEXT:table.field:('=', '<', '>', '<=', '>=', '~')%%
+%%FILTER_SEMESTER:table.field%%
+%%FILTER_YEARNUMERIC:table.field%%
+%%FILTER_YEARHEBREW:table.field%%
+%%FILTER_COURSES:mdl_course.id%%
+%%FILTER_MYCOURSE:table.field%%
+%%FILTER_CATEGORIES:mdl_course.category%%
+%%FILTER_SUBCATEGORIES:mdl_course_category.path%%
+%%FILTER_FLSUBCATEGORIES:mdl_course_category.path%%
+%%FILTER_ROLE:table.field%%
+%%FILTER_STARTTIME:l.time:>%% %%FILTER_ENDTIME:l.time:<%% ('<', '>', '<=', '>=', '~')
+%%FILTER_COURSEMODULEID%% , %%FILTER_COURSEMODULEFIELDS%% , %%FILTER_COURSEMODULE%%
+%%FILTER_USERS:table.field%%
+%%FILTER_SYSTEMUSER:table.field%%
+%%FILTER_COURSEUSER:table.field%%
+%%FILTER_MODULE:mdl_moduels.id%%
 
 Added support for Moodle 2.7
 

@@ -34,12 +34,10 @@ function cr_print_js_function() {
             tmpw.document.open();
             tmpw.document.write('<html><body>');
             tmpw.document.write(cdiv.innerHTML);
-            tmpw.document.write('</'+'body></html>');
+            tmpw.document.write('</body></html>');
             tmpw.document.close();
-            setTimeout(function() {
-                tmpw.print();
-                tmpw.close();
-            }, 1000);
+            tmpw.print();
+            tmpw.close();
         }
     </script>
 <?php
@@ -67,23 +65,39 @@ function cr_add_jsdatatables($cssid) {
         'datatables_zerorecords',
     ), 'block_configurable_reports');
 
-    $script = new moodle_url('/blocks/configurable_reports/js/datatables/media/js/jquery.js');
+    /*
+    $script = new moodle_url('/blocks/configurable_reports/js/jquery-latest.js');
     $script = '
         if (typeof jQuery == "undefined") {
             document.write(unescape("%3Cscript type=\"text/javascript\" src=\"'.$script.'\"%3E%3C/script%3E"));
         }
     ';
     echo html_writer::script($script);
-    echo html_writer::script(false, new moodle_url('/blocks/configurable_reports/js/datatables/media/js/jquery.dataTables.min.js'));
-    echo html_writer::script(false, new moodle_url('/blocks/configurable_reports/js/datatables/extras/FixedHeader/js/FixedHeader.js'));
+    */
+
+    $verticalscroll = '';
+    $fixheader = '';
+    // We can either have vertical scroll OR fixed header...
+    if(get_config('block_configurable_reports', 'verticalscroll')) {
+        $verticalscroll = " 'sScrollX': '100%',
+            //'sScrollXInner': '110%',
+            'sScrollY': '500',
+            'bScrollCollapse': true, ";
+        echo html_writer::tag('style', '.dataTables_scroll {overflow: auto;}');
+        if (right_to_left()) {
+            echo html_writer::tag('style', '.dataTables_scroll {overflow: auto;} .dataTables_scrollHeadInner{padding-right:0 !important; padding-left:14px;}');
+        }
+    } else {
+        $fixheader = "new FixedHeader( oTable, { footer: true } );";
+    }
 
     $script = "$(document).ready(function() {
         var oTable = $('$cssid').dataTable({
-            'bAutoWidth': false,
-            'sPaginationType': 'full_numbers',
-//                'sScrollX': '100%',
-//                'sScrollXInner': '110%',
-//                'bScrollCollapse': true
+            //'bAutoWidth': true,
+            'aLengthMenu': [ [10, 25, 50, 100, -1], [10, 25, 50, 100, \"All\"] ],
+            'iDisplayLength': 25,
+            //'sPaginationType': 'full_numbers',
+            $verticalscroll
             'oLanguage': {
                 'oAria': {
                     'sSortAscending': M.str.block_configurable_reports.datatables_sortascending,
@@ -107,7 +121,10 @@ function cr_add_jsdatatables($cssid) {
                 'sZeroRecords': M.str.block_configurable_reports.datatables_zerorecords
             }
         });
-        new FixedHeader( oTable );
+        //debugger;
+        $fixheader
+        window.otable = oTable;
+        //M.block_configurable_reports.oTable = oTable;
     } );";
     echo html_writer::script($script);
 }
@@ -115,7 +132,7 @@ function cr_add_jsdatatables($cssid) {
 function cr_add_jsordering($cssid) {
     global $DB, $CFG, $OUTPUT;
 
-    $script = new moodle_url('/blocks/configurable_reports/js/datatables/media/js/jquery.js');
+    $script = new moodle_url('/blocks/configurable_reports/js/jquery-latest.js');
     $script = '
         if (typeof jQuery == "undefined") {
             document.write(unescape("%3Cscript type=\"text/javascript\" src=\"'.$script.'\"%3E%3C/script%3E"));
@@ -316,8 +333,26 @@ function cr_print_table($table, $return = false) {
         $table->class = 'generaltable';
     }
 
+    $action = '';
+    foreach ($table->head as $key => $heading) {
+        if ($heading === 'sendemail') {
+            $action = 'sendemail';
+        }
+        if ($heading === 'addtogroup') {
+            $action = 'addtogroup';
+        }
+    }
+
     $tableid = empty($table->id) ? '' : 'id="'.$table->id.'"';
-    $output .= '<form action="send_emails.php" method="post" id="sendemail">';
+    switch ($action) {
+        case 'sendemail':
+            $output .= '<form action="send_emails.php" method="post" id="sendemail">';
+            break;
+        case 'addtogroup':
+            $output .= '<form action="add_to_group.php" method="post" id="addtogroup">';
+            break;
+    }
+
     $output .= '<table width="'.$table->width.'" ';
     if (!empty($table->summary)) {
         $output .= " summary=\"$table->summary\"";
@@ -334,6 +369,9 @@ function cr_print_table($table, $return = false) {
         $lastkey = end($keys);
         foreach ($table->head as $key => $heading) {
             if ($heading == 'sendemail') {
+                $isuserid = $key;
+            }
+            if ($heading == 'addtogroup') {
                 $isuserid = $key;
             }
             if (!isset($size[$key])) {
@@ -366,30 +404,30 @@ function cr_print_table($table, $return = false) {
                 $table->rowclass[$key] .= ' lastrow';
             }
             $output .= '<tr class="r'.$oddeven.' '.$table->rowclass[$key].'">'."\n";
-            if ($row == 'hr' and $countcols) {
+            if ($row === 'hr' and $countcols) {
                 $output .= '<td colspan="'. $countcols .'"><div class="tabledivider"></div></td>';
             } else {  // It's a normal row of data.
                 $keys2 = array_keys($row);
                 $lastkey = end($keys2);
-                foreach ($row as $key => $item) {
-                    if (!isset($size[$key])) {
-                        $size[$key] = '';
+                foreach ($row as $rkey => $item) {
+                    if (!isset($size[$rkey])) {
+                        $size[$rkey] = '';
                     }
-                    if (!isset($align[$key])) {
-                        $align[$key] = '';
+                    if (!isset($align[$rkey])) {
+                        $align[$rkey] = '';
                     }
-                    if (!isset($wrap[$key])) {
-                        $wrap[$key] = '';
+                    if (!isset($wrap[$rkey])) {
+                        $wrap[$rkey] = '';
                     }
-                    if ($key == $lastkey) {
+                    if ($rkey == $lastkey) {
                         $extraclass = ' lastcol';
                     } else {
                         $extraclass = '';
                     }
-                    if ($key == $isuserid) {
-                        $output .= '<td style="'. $align[$key].$size[$key].$wrap[$key] .'" class="cell c'.$key.$extraclass.'"><input name="userids[]" type="checkbox" value="'.$item.'"></td>';
+                    if ($rkey == $isuserid) {
+                        $output .= '<td style="'. $align[$rkey].$size[$rkey].$wrap[$rkey] .'" class="cell c'.$rkey.$extraclass.'"><input name="userids[]" type="checkbox" value="'.$item.'"></td>';
                     } else {
-                        $output .= '<td style="'. $align[$key].$size[$key].$wrap[$key] .'" class="cell c'.$key.$extraclass.'">'. $item .'</td>';
+                        $output .= '<td style="'. $align[$rkey].$size[$rkey].$wrap[$rkey] .'" class="cell c'.$rkey.$extraclass.'">'. $item .'</td>';
                     }
 
                 }
@@ -398,11 +436,26 @@ function cr_print_table($table, $return = false) {
         }
     }
     $output .= '</table>'."\n";
+
+    // Action form
     $output .= '<input type="hidden" name="courseid" value="'.$COURSE->id.'">';
-    if ($isuserid != -1) {
-        $output .= '<input type="submit" value="send emails">';
+    $reportid = optional_param('id', 1, PARAM_INT);
+    $output .= '<input type="hidden" name="reportid" value="'.$reportid.'">';
+    switch ($action) {
+        case 'sendemail':
+            if ($isuserid != -1) {
+                $output .= '<input type="submit" value="'.get_string('email_sendemails', 'block_configurable_reports').'">';
+                $output .= '</form>';
+            }
+            break;
+        case 'addtogroup':
+            //$output .= '';
+            $output .= '<br>'.get_string('group_newgroupname', 'block_configurable_reports').
+                        '<div id="newgroupname"><input type="text" name="newgroupname"></div>';
+            $output .= '<input type="submit" value="'.get_string('group_addtogroup', 'block_configurable_reports').'">';
+            $output .= '</form>';
+            break;
     }
-    $output .= '</form>';
 
     if ($return) {
         return $output;
@@ -560,8 +613,14 @@ function cr_import_xml($xml, $course) {
     return false;
 }
 
-// For avoid warnings in versions minor than 2.7.
+/**
+ * Add an entry to the legacy log table.
+ *
+ * @deprecated since 2.7 use new events instead
+ *
+*/
 function cr_add_to_log($courseid, $module, $action, $url='', $info='', $cm=0, $user=0) {
+    // Depricated.
     global $CFG;
 
     if ($CFG->version < 2014051200) {

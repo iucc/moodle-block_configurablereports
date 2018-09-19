@@ -23,10 +23,6 @@ global $PAGE, $USER, $DB, $COURSE;
 $context = context_course::instance($COURSE->id);
 $PAGE->set_context($context);
 
-if (!has_capability('block/configurable_reports:managereports', $context) && !has_capability('block/configurable_reports:manageownreports', $context)) {
-    print_error('badpermissions');
-}
-
 class sendemail_form extends moodleform {
 
     public function definition() {
@@ -42,7 +38,9 @@ class sendemail_form extends moodleform {
         ];
 
         $mform->addElement('hidden', 'usersids', $this->_customdata['usersids']);
+        $mform->setType('usersids', PARAM_TEXT);
         $mform->addElement('hidden', 'courseid', $this->_customdata['courseid']);
+        $mform->setType('courseid', PARAM_INT);
 
         $mform->addElement('text', 'subject', get_string('email_subject', 'block_configurable_reports'));
         $mform->setType('subject', PARAM_TEXT);
@@ -71,9 +69,11 @@ if ($form->is_cancelled()) {
     redirect(new \moodle_url('/course/view.php?id='.$data->courseid));
 }
 
-$PAGE->set_title(get_string('email', 'questionnaire'));
+$PAGE->set_title(get_string('email', 'block_configurable_reports'));
 $PAGE->set_heading(format_string($COURSE->fullname));
-$PAGE->navbar->add(get_string('email', 'questionnaire'));
+$PAGE->navbar->add(get_string('email', 'block_configurable_reports'));
+$reportid = optional_param('reportid', 1, PARAM_INT);
+$PAGE->set_url('/blocks/configurable_reports/viewreport.php', ['id' => $reportid]);
 
 echo $OUTPUT->header();
 

@@ -65,7 +65,7 @@ class puserfield_form extends moodleform {
     }
 
     public function validation($data, $files) {
-        global $DB, $db, $CFG;
+        global $DB;
 
         $errors = parent::validation($data, $files);
 

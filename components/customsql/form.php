@@ -39,7 +39,7 @@ class customsql_form extends moodleform {
 
         $mform =& $this->_form;
 
-        $mform->addElement('textarea', 'querysql', get_string('querysql', 'block_configurable_reports'), 'rows="35" cols="80"');
+        $mform->addElement('textarea', 'querysql', get_string('querysql', 'block_configurable_reports'), 'rows="55" cols="100"');
         $mform->addRule('querysql', get_string('required'), 'required', null, 'client');
         $mform->setType('querysql', PARAM_RAW);
 
@@ -48,9 +48,32 @@ class customsql_form extends moodleform {
 
         $this->add_action_buttons();
 
-        $mform->addElement('static', 'note', '', get_string('listofsqlreports', 'block_configurable_reports'));
+        $mform->addElement('static', 'note', '',
+            html_writer::tag('span', get_string('helpeditingsqlqueries', 'block_configurable_reports'),
+                array('class' =>'sqlhelper')) );
+
+        $mform->addElement('header', 'sectionheader-sqlhelp', get_string('header_editingsqlqueries', 'block_configurable_reports'));
+        $mform->setExpanded('sectionheader-sqlhelp', false);
+
+        $mform->addElement('static', 'note', '',
+        html_writer::tag('span', get_string('helpvariablesandfilters', 'block_configurable_reports'),
+            array('class' =>'sqlvariablehelper')) );
+
+        /*
+        $mform->addElement('static', 'note', '',
+            html_writer::tag('details',
+                html_writer::tag('summary', 'SQL Help', array('class' =>'summary_sqlhelper')) .
+                html_writer::tag('span', get_string('listofsqlreports', 'block_configurable_reports'),
+                    array('class' =>'sqlhelper')),
+                array('class' =>'details_sqlhelper')
+            )
+        );
+        */
 
         if ($userandrepo = get_config('block_configurable_reports', 'sharedsqlrepository')) {
+
+            $mform->addElement('header', 'sectionheader', get_string('header_sharedsqlrepository', 'block_configurable_reports'));
+            $mform->setExpanded('sectionheader', false);
 
             $github = new \block_configurable_reports\github;
             $github->set_repo($userandrepo);
@@ -104,7 +127,8 @@ class customsql_form extends moodleform {
             // Do not allow any semicolons.
             $errors['querysql'] = get_string('nosemicolon', 'report_customsql');
 
-        } else if ($CFG->prefix != '' && preg_match('/\b' . $CFG->prefix . '\w+/i', $sql)) {
+        } else if (get_config('block_configurable_reports', 'requireprefix') &&
+            $CFG->prefix != '' && preg_match('/\b' . $CFG->prefix . '\w+/i', $sql)) {
             // Make sure prefix is prefix_, not explicit.
             $errors['querysql'] = get_string('noexplicitprefix', 'block_configurable_reports');
 

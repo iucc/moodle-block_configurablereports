@@ -37,12 +37,10 @@ class block_configurable_reports extends block_list {
      * Act on instance data.
      */
     public function specialization() {
-
-        if ($this->config) {
-            $this->title = $this->config->title ? get_string('pluginname', 'block_configurable_reports') : $this->config->title;
+        if (empty($this->config->title)) {
+            $this->title = get_string('pluginname', 'block_configurable_reports');
         } else {
-            $this->config = new stdClass();
-            $this->config->displayglobalreports = true;
+            $this->title = $this->config->title;
         }
     }
 

@@ -73,5 +73,54 @@ function xmldb_block_configurable_reports_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2011040115, 'block', 'configurable_reports');
     }
 
+    if ($oldversion < 2016020104) {
+
+        $table = new xmldb_table('block_configurable_reports');
+
+        $field = new xmldb_field('customhtml', XMLDB_TYPE_TEXT, 'long');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2016020104, 'block', 'configurable_reports');
+    }
+
+    if ($oldversion < 2016020105) {
+
+        $table = new xmldb_table('block_configurable_reports');
+
+        $field = new xmldb_field('alias', XMLDB_TYPE_CHAR, '64', null, false, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        //upgrade_block_savepoint(true, 2016020105, 'configurable_reports');
+        upgrade_plugin_savepoint(true, 2016020105, 'block', 'configurable_reports');
+    }
+
+    if ($oldversion < 2016020106) {
+
+        $table = new xmldb_table('block_configurable_reports');
+
+        $field = new xmldb_field('coursemodule', XMLDB_TYPE_NUMBER, '2' );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2016020106, 'block', 'configurable_reports');
+    }
+
+    if ($oldversion < 2016020107) {
+
+        $table = new xmldb_table('block_configurable_reports');
+
+        $field = new xmldb_field('plugin', XMLDB_TYPE_CHAR, '128', null, false, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('eventname', XMLDB_TYPE_CHAR, '128', null, false, null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2016020107, 'block', 'configurable_reports');
+    }
+
     return true;
 }

@@ -12,15 +12,17 @@
         <FIELD NAME="visible" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="ownerid" NEXT="name"/>
         <FIELD NAME="name" TYPE="char" LENGTH="128" NOTNULL="true" SEQUENCE="false"  PREVIOUS="visible" NEXT="summary"/>
         <FIELD NAME="summary" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"  PREVIOUS="name" NEXT="type"/>
-        <FIELD NAME="type" TYPE="char" LENGTH="128" NOTNULL="true" SEQUENCE="false"  PREVIOUS="summary" NEXT="pagination"/>
-		<FIELD NAME="pagination" TYPE="int" LENGTH="4" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="type" NEXT="components"/>
+        <FIELD NAME="customhtml" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"  PREVIOUS="summary" NEXT="type"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="128" NOTNULL="true" SEQUENCE="false"  PREVIOUS="customhtml" NEXT="pagination"/>
+        <FIELD NAME="pagination" TYPE="int" LENGTH="4" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="type" NEXT="components"/>
         <FIELD NAME="components" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"  PREVIOUS="pagination" NEXT="export"/>
         <FIELD NAME="export" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"  PREVIOUS="components" NEXT="jsordering"/>
         <FIELD NAME="jsordering" TYPE="int" LENGTH="4" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="export" NEXT="global"/>
         <FIELD NAME="global" TYPE="int" LENGTH="4" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="jsordering" NEXT="lastexecutiontime"/>
         <FIELD NAME="lastexecutiontime" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="Time this report took to run last time it was executed, in milliseconds." PREVIOUS="global" NEXT="cron"/>
         <FIELD NAME="cron" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="lastexecutiontime" NEXT="remote" COMMENT="Should we run this query on regular CRON"/>
-        <FIELD NAME="remote" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="cron"/>
+        <FIELD NAME="remote" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="cron" NEXT="alias"/>
+        <FIELD NAME="alias" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" PREVIOUS="remote" COMMENT="Unique English Alias that is used to invoke sub-report by this report, and not break when distributed to other systems"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

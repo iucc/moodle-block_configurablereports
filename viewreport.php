@@ -22,16 +22,30 @@
  * @date: 2009
  */
 
-require_once("../../config.php");
+require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot."/blocks/configurable_reports/locallib.php");
 
-$id = required_param('id', PARAM_INT);
+$id = optional_param('id', 1, PARAM_INT);
 $download = optional_param('download', false, PARAM_BOOL);
 $format = optional_param('format', '', PARAM_ALPHA);
 $courseid = optional_param('courseid', null, PARAM_INT);
+$alias = optional_param('alias','',PARAM_ALPHA);
+$layout = optional_param('layout','full',PARAM_ALPHA);
 
-if (!$report = $DB->get_record('block_configurable_reports', ['id' => $id])) {
-    print_error('reportdoesnotexists', 'block_configurable_reports');
+
+if ($id === 0 && $alias === '') {
+    print_error('Please supply report ID or Alias to run the report');
+}
+
+// Try looking for alias first, before using report ID.
+if (!empty($alias)) {
+    if (!$report = $DB->get_record('block_configurable_reports', array('alias' => $alias))) {
+        print_error('reportdoesnotexists', 'block_configurable_reports');
+    }
+} else {
+    if (!$report = $DB->get_record('block_configurable_reports', array('id' => $id))) {
+        print_error('reportdoesnotexists', 'block_configurable_reports');
+    }
 }
 
 if ($courseid && $report->global) {
@@ -63,8 +77,14 @@ if (!$reportclass->check_permissions($USER->id, $context)) {
     print_error('badpermissions', 'block_configurable_reports');
 }
 
+if (get_config('block_configurable_reports', 'reporttableui') === 'datatables') {
+    $PAGE->requires->css('/blocks/configurable_reports/js/datatables/media/css/jquery.dataTables.css');
+    $PAGE->requires->js('/blocks/configurable_reports/js/datatables/media/js/jquery.dataTables.min.js', true);
+    $PAGE->requires->js('/blocks/configurable_reports/js/datatables/extras/FixedHeader/js/FixedHeader.js', true);
+}
+
 $PAGE->set_context($context);
-$PAGE->set_pagelayout('incourse');
+$PAGE->set_pagelayout('report');
 $PAGE->set_url('/blocks/configurable_reports/viewreport.php', ['id' => $id]);
 $PAGE->requires->jquery();
 
@@ -73,7 +93,8 @@ $reportclass->create_report();
 $download = ($download && $format && strpos($report->export, $format.',') !== false) ? true : false;
 
 $action = (!empty($download)) ? 'download' : 'view';
-cr_add_to_log($report->courseid, 'configurable_reports', $action, '/block/configurable_reports/viewreport.php?id='.$id, $report->name);
+//cr_add_to_log($report->courseid, 'configurable_reports', $action, '/block/configurable_reports/viewreport.php?id='.$id, $report->name);
+\block_configurable_reports\event\report_viewed::create_from_report($report, context_course::instance($course->id))->trigger();
 
 // No download, build navigation header etc..
 if (!$download) {
@@ -95,9 +116,11 @@ if (!$download) {
     $PAGE->set_cacheable( true);
     echo $OUTPUT->header();
 
-    if ($hasmanageallcap || ($hasmanageowncap && $report->ownerid == $USER->id)) {
-        $currenttab = 'viewreport';
-        include('tabs.php');
+    if ($layout === 'full') {
+        if ($hasmanageallcap || ($hasmanageowncap && $report->ownerid == $USER->id)) {
+            $currenttab = 'viewreport';
+            include('tabs.php');
+        }
     }
 
     // Print the report HTML.
@@ -105,13 +128,16 @@ if (!$download) {
 
 } else {
 
-    $exportplugin = $CFG->dirroot.'/blocks/configurable_reports/export/'.$format.'/export.php';
-    if (file_exists($exportplugin)) {
-        require_once($exportplugin);
-        export_report($reportclass->finalreport);
+    if ($layout === 'full') {
+        $exportplugin = $CFG->dirroot . '/blocks/configurable_reports/export/' . $format . '/export.php';
+        if (file_exists($exportplugin)) {
+            require_once($exportplugin);
+            export_report($reportclass->finalreport);
+        }
+        die;
     }
-    die;
 }
+
 
 // Never reached if download = true.
 echo $OUTPUT->footer();

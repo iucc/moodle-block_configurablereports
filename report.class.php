@@ -747,6 +747,10 @@ class report_base {
             echo '<div class="centerpara">'.get_string('norecordsfound', 'block_configurable_reports').'</div>';
         }
 
+        echo '<div class="customhtml">';
+        echo $this->config->customhtml;
+        echo '</div>';
+
         echo '<div class="centerpara"><br />';
         echo $OUTPUT->pix_icon('print', get_string('printreport', 'block_configurable_reports'), 'block_configurable_reports');
         echo "&nbsp;<a href=\"javascript: printDiv('printablediv')\">".get_string('printreport', 'block_configurable_reports')."</a>";

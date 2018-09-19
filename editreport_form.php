@@ -36,6 +36,8 @@ class report_edit_form extends moodleform {
         $adminmode = optional_param('adminmode', null, PARAM_INT);
 
         $mform =& $this->_form;
+        $eventlist = $this->_customdata['eventlist'];
+        $pluginlist = $this->_customdata['pluginlist'];
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
@@ -47,8 +49,37 @@ class report_edit_form extends moodleform {
         }
         $mform->addRule('name', null, 'required', null, 'client');
 
+        // Alias is a "unique id" alternative to ID, that should work when distributing reports to other systems.
+        // (used to link internal reports)
+        $mform->addElement('text', 'alias', get_string('alias','block_configurable_reports'),array('maxlength' => 64, 'size' => 30));
+        $mform->addHelpButton('alias','alias', 'block_configurable_reports');
+        $mform->setType('alias', PARAM_ALPHA);
+
         $mform->addElement('htmleditor', 'summary', get_string('summary'));
         $mform->setType('summary', PARAM_RAW);
+
+        // Plugin field.
+        $mform->addElement('select', 'plugin', get_string('areatomonitor', 'tool_monitor'), $pluginlist);
+        //$mform->addRule('plugin', get_string('required'), 'required');
+
+        // Event field.
+        $mform->addElement('select', 'eventname', get_string('event', 'tool_monitor'), $eventlist);
+        //$mform->addRule('eventname', get_string('required'), 'required');
+
+        $courseoptions = array();
+        $courseoptions[0] = get_string('filter_all', 'block_configurable_reports');
+
+        $coursemodules = $DB->get_records('modules');
+        foreach ($coursemodules as $c) {
+            $courseoptions[$c->id] = format_string(get_string('pluginname', $c->name).' = '.$c->name);
+        }
+        $elestr = get_string('filtercoursemodules', 'block_configurable_reports');
+        $mform->addElement('select', 'coursemodule', $elestr, $courseoptions);
+        $mform->setType('coursemodule', PARAM_INT);
+
+        $mform->addElement('textarea', 'customhtml', get_string('customhtml', 'block_configurable_reports'),
+            array('rows'=>'15', 'cols'=>'80'));
+        $mform->setType('customhtml', PARAM_RAW);
 
         $typeoptions = cr_get_report_plugins($this->_customdata['courseid']);
 

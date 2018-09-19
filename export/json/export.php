@@ -18,26 +18,33 @@
  * Configurable Reports
  * A Moodle block for creating customizable reports
  * @package blocks
- * @author  : Juan leyva <http://www.twitter.com/jleyvadelgado>
- * @date    : 2009
- * @param $report
+ * @author: Juan leyva <http://www.twitter.com/jleyvadelgado>
+ * @author: Nadav Kavalerchik <http://www.twitter.com/moodlemagic>
+ * @date: 2018
  */
-function export_report($report){
+
+/*  Export report data as JSON.
+ *
+ * @param $report report data
+ */
+function export_report($report) {
+
     $table = $report->table;
-    $filename = 'report_' . (time()) . '.json';
-    $json = [];
-    $headers = $table->head;
-    foreach ($table->data as $data) {
-        $jsonObject = [];
-        foreach ($data as $index => $value) {
-            $jsonObject[$headers[$index]] = $value;
+    $matrix = array();
+
+    if (!empty($table->head)) {
+        foreach ($table->head as $key => $heading) {
+            $matrix_keys[$key] = str_replace("\n", ' ', htmlspecialchars_decode(strip_tags(nl2br($heading))));
         }
-        $json[] = $jsonObject;
     }
 
-    $downloadfilename = clean_filename($filename);
-    header('Content-disposition: attachment; filename=' . $downloadfilename);
-    header('Content-type: application/json');
-    echo json_encode($json);
-    exit;
+    if (!empty($table->data)) {
+        foreach ($table->data as $rkey => $row) {
+            foreach ($row as $key => $item) {
+                $matrix[$rkey][$matrix_keys[$key]] = str_replace("\n", ' ', htmlspecialchars_decode(strip_tags(nl2br($item))));
+            }
+        }
+    }
+
+    echo json_encode($matrix);
 }

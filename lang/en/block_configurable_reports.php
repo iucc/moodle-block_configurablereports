@@ -43,10 +43,10 @@ $string['field'] = "Field";
 $string['typeofreport'] = "Type of report";
 $string['enablejsordering'] = "Enable JavaScript ordering";
 $string['enablejspagination'] = "Enable JavaScript Pagination";
+$string['export_json'] = "Export in JSON format";
 $string['export_csv'] = "Export in CSV format";
 $string['export_ods'] = "Export in ODS format";
 $string['export_xls'] = "Export in XLS format";
-$string['export_json'] = "Export in JSON format";
 $string['viewreport'] = "View report";
 $string['norecordsfound'] = "No records found";
 $string['jsordering'] = 'JavaScript Ordering';
@@ -250,7 +250,43 @@ $string['noexplicitprefix'] = "No explicit prefix";
 $string['queryfailed'] = 'Query failed <code><pre>{$a}</pre></code>';
 $string['norowsreturned'] = "No rows returned";
 
-$string['listofsqlreports'] = 'Press F11 when cursor is in the editor to toggle full screen editing. Esc can also be used to exit full screen editing.<br/><br/><a href="http://docs.moodle.org/en/ad-hoc_contributed_reports" target="_blank">List of SQL Contributed reports</a>';
+$string['header_editingsqlqueries'] = "SQL variables and filters";
+$string['helpeditingsqlqueries'] = 'F11:  Toggle full screen editing. Esc can also be used to exit full screen editing.<br/>
+CTRL-F:  Search<br/>
+CTRL-SHIFT-F:  Replace<br/><br/>
+Get inspiration from a list of: <a href="http://docs.moodle.org/en/ad-hoc_contributed_reports" target="_blank">Useful shared contributed SQL reports</a><br>
+An updated layout of Moodle\'s tables and their interconnected relations: <a href = "https://docs.moodle.org/dev/Database_Schema" target = "_blank" > Database schema </a >';
+
+$string['helpvariablesandfilters'] = '<br/>
+%%COURSEID%% , %%USERID%% , %%CATEGORYID%% , %%CMID%% , %%FILTER_VAR%%<br/>
+%%DEBUG%% - Display the SQL query<br/>
+<br/>
+And Special filters (if available!):<br/>
+%%FILTER_SEARCHTEXT:table.field:(\'=\', \'<\', \'>\', \'<=\', \'>=\', \'~\')%%<br/>
+%%FILTER_SEMESTER:table.field%%<br/>
+%%FILTER_YEARNUMERIC:table.field%%<br/>
+%%FILTER_YEARHEBREW:table.field%%<br/>
+%%FILTER_COURSES:table.field%%<br/>
+%%FILTER_MYCOURSE:table.field%%<br/>
+%%FILTER_CATEGORIES:table.field%%<br/>
+%%FILTER_SUBCATEGORIES:table.field%%<br/>
+%%FILTER_ROLE:table.field%%<br/>
+%%FILTER_STARTTIME:l.time:>%% %%FILTER_ENDTIME:l.time:<%% (\'<\', \'>\', \'<=\', \'>=\', \'~\')<br/>
+%%FILTER_COURSEMODULEID%% , %%FILTER_COURSEMODULEFIELDS%% , %%FILTER_COURSEMODULE%% <br/>
+%%FILTER_USERS:table.field%%<br/>
+%%FILTER_SYSTEMUSER:table.field%%<br/>
+%%FILTER_COURSEUSER:table.field%%<br/>
+%%FILTER_COURSEENROLLEDSTUDENTS:table.field%%<br/>
+<br/>
+Virtual fields/columns:<br/>
+sendemail - must be based on email type field (like: mdl_user.email)<br/>
+addtogoup - must be based on userid type field (like: mdl_user.id)<br/>
+<br/>
+Use core PHP functions:<br/>
+CONCAT("php_strip_tags(\'", q.questiontext, "\')") AS \'striptags\'<br/> 
+';
+
+$string['header_sharedsqlrepository'] = "Shared sql repository";
 
 $string['usersincoursereport_summary'] = "Any user in the current report course";
 
@@ -360,8 +396,6 @@ $string['comp_customsql_help'] = '<p>Add a working SQL query. Do no use the mood
 
 <p>You can find a lot of SQL Reports here: <a href="http://docs.moodle.org/en/ad-hoc_contributed_reports" target="_blank">ad-hoc contributed reports</a></p>
 
-<p>An updated layout of Moodle\'s tables and their interconnected relations: <a href="https://docs.moodle.org/dev/Database_Schema" target="_blank">Database schema</a></p> 
-
 <p>Since this block supports Tim Hunt\'s CustomSQL Queries Reports, you can use any query.</p>
 
 <p>Remember to add a "Time filter" if you are going to use reports with time tokens. </p>
@@ -426,14 +460,26 @@ $string['sharedsqlrepository'] = 'Shared sql repository';
 $string['sharedsqlrepositoryinfo'] = 'Name of GitHub account owner + slash + repository name';
 $string['sqlsyntaxhighlight'] = 'Highlight SQL syntax';
 $string['sqlsyntaxhighlightinfo'] = 'Highlight SQL syntax in code editor (CodeMirror JS library)';
+$string['sqlsearchnreplace'] = 'Search & Replace inside SQL query';
+$string['sqlsearchnreplaceinfo'] = 'Use CTRL+SHIFT+F to Search & Replace inside SQL query (CodeMirror JS library)';
+$string['sqlautocomplete'] = 'Autocomplete SQL commands';
+$string['sqlautocompleteinfo'] = 'Use CTRL+SPACE to autocomplete SQL commands (CodeMirror JS library)';
 $string['datatables'] = 'Enable DataTables JS library';
 $string['datatablesinfo'] = 'DataTables JS library (Column sort, fixed header, search, paging...)';
 $string['reporttableui'] = 'Report table UI';
 $string['reporttableuiinfo'] = 'Display the report table as: Simple scrollable HTML table, jQuery with column sorting Or DataTables JS library (Column sort, fixed header, search, paging...)';
+$string['requireprefix'] = 'Require tables to use prefix_';
+$string['requireprefixinfo'] = 'Disabling this option will allow tables to start with mdl_ and not prefix_';
+$string['verticalscroll'] = 'Vertical scroll';
+$string['verticalscrollinfo'] = 'Enable Vertical scroll, BUT disable fixed headers';
 
+$string['email'] = 'eMail';
 $string['email_subject'] = 'Subject';
 $string['email_message'] = 'Message';
 $string['email_send'] = 'Send';
+$string['email_sendemails'] = 'Send emails';
+$string['group_newgroupname'] = 'New group name';
+$string['group_addtogroup'] = 'Add to group';
 
 $string['sqlsecurity'] = 'SQL Security';
 $string['sqlsecurityinfo'] = 'Disable for executing SQL queries with statements for inserting data';
@@ -489,3 +535,18 @@ $string['sessionlimittime'] = 'Limit between clicks (in minutes)';
 $string['sessionlimittime_help'] = 'The limit between clicks defines if two clicks are part of the same session or not';
 
 $string['excludedeletedusers'] = 'Exclude deleted users (only for SQL reports)';
+$string['customhtml'] = 'Add external JavaScript and CSS libs';
+$string['alias'] = 'Alias';
+$string['alias_help'] = 'Alias, is a unique (all English letters) identifier for this report, so it can be link between reports and not break when deployed to other systems';
+
+$string['systemreports'] = 'Shared system reports';
+$string['modulereports'] = 'Module reports';
+
+// Events
+$string['eventreportviewed'] = 'Report viewed';
+$string['eventreportedited'] = 'Report edited';
+$string['eventreportcreated'] = 'Report created';
+$string['eventreportdeleted'] = 'Report deleted';
+$string['eventreportduplicated'] = 'Report duplicated';
+$string['eventreportshowed'] = 'Report showed';
+$string['eventreporthidden'] = 'Report hidden';

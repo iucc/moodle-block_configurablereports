@@ -159,7 +159,8 @@ if (isset($pluginclass->form) && $pluginclass->form) {
             redirect($CFG->wwwroot.'/blocks/configurable_reports/editreport.php');
         }
     } else if ($data = $editform->get_data()) {
-        cr_add_to_log($report->courseid, 'configurable_reports', 'edit', '', $report->name);
+        //cr_add_to_log($report->courseid, 'configurable_reports', 'edit', '', $report->name);
+        \block_configurable_reports\event\report_edited::create_from_report($report, $context)->trigger();
         if (!empty($cdata)) {
             $cdata['formdata'] = $data;
             $cdata['summary'] = $pluginclass->summary($data);

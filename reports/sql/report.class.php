@@ -31,7 +31,7 @@ class report_sql extends report_base {
     }
 
     public function prepare_sql($sql) {
-        global $DB, $USER, $CFG, $COURSE;
+        global $USER, $CFG, $COURSE;
 
         // Enable debug mode from SQL query.
         $this->config->debug = (strpos($sql, '%%DEBUG%%') !== false) ? true : false;
@@ -44,13 +44,24 @@ class report_sql extends report_base {
             $sql = str_replace('%%FILTER_VAR%%', $filtervar, $sql);
         }
 
-        $sql = str_replace('%%USERID%%', $USER->id, $sql);
-        $sql = str_replace('%%COURSEID%%', $COURSE->id, $sql);
-        $sql = str_replace('%%CATEGORYID%%', $COURSE->category, $sql);
+        $courseid = optional_param('courseid', null, PARAM_INT);
+        if (!empty($courseid)) {
+            $sql = str_replace('%%COURSEID%%', $courseid, $sql);
+        } else {
+            $sql = str_replace('%%COURSEID%%', $COURSE->id, $sql);
+        }
+
+        $cmid = optional_param('cmid', null, PARAM_INT);
+        if (!empty($cmid)) {
+            $sql = str_replace('%%CMID%%', $cmid, $sql);
+        }
+
+        $sql = str_replace( array('%%USERID%%', '%%COURSEID%%', '%%CATEGORYID%%'),
+                            array($USER->id, $COURSE->id, $COURSE->category), $sql);
 
         // See http://en.wikipedia.org/wiki/Year_2038_problem.
-        $sql = str_replace(array('%%STARTTIME%%', '%%ENDTIME%%'), array('0', '2145938400'), $sql);
-        $sql = str_replace('%%WWWROOT%%', $CFG->wwwroot, $sql);
+        $sql = str_replace( array('%%STARTTIME%%', '%%ENDTIME%%', '%%WWWROOT%%'),
+                            array('0', '2145938400', $CFG->wwwroot), $sql);
         $sql = preg_replace('/%{2}[^%]+%{2}/i', '', $sql);
 
         $sql = str_replace('?', '[[QUESTIONMARK]]', $sql);
@@ -64,7 +75,7 @@ class report_sql extends report_base {
         $sql = preg_replace('/\bprefix_(?=\w+)/i', $CFG->prefix, $sql);
 
         $reportlimit = get_config('block_configurable_reports', 'reportlimit');
-        if (empty($reportlimit) or $reportlimit == '0') {
+        if (empty($reportlimit) || $reportlimit == '0') {
                 $reportlimit = BLOCK_CONFIGURABLE_REPORTS_MAX_RECORDS;
         }
 
@@ -123,11 +134,22 @@ class report_sql extends report_base {
                 foreach ($rs as $row) {
                     if (empty($finaltable)) {
                         foreach ($row as $colname => $value) {
-                            $tablehead[] = str_replace('_', ' ', $colname);
+                            // Following line was disabled, as it breaks links in the columns headers.
+                            //$tablehead[] = str_replace('_', ' ', $colname);
+                            // Fix "questionmarks" in links, as it breaks links in the columns headers.
+                            $tablehead[] = str_replace('[[questionmark]]', '?', $colname);
                         }
                     }
                     $arrayrow = array_values((array) $row);
                     foreach ($arrayrow as $ii => $cell) {
+                        if (strpos($cell, 'php_') === 0) {
+                            $cell = str_replace('php_', '', $cell);
+                            //$cell = str_replace('\'', '\"', $cell);
+                            $temp_cell = '';
+                            // NOTICE: Security issue! running PHP function on top of SQL queries results.
+                            $evalresult = eval('$temp_cell = '.$cell.';');
+                            $cell = $temp_cell;
+                        }
                         $cell = format_text($cell, FORMAT_HTML, array('trusted' => true, 'noclean' => true, 'para' => false));
                         $arrayrow[$ii] = str_replace('[[QUESTIONMARK]]', '?', $cell);
                     }

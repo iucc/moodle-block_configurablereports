@@ -78,7 +78,7 @@ if (!in_array($comp, $reportclass->components)) {
 }
 
 $PAGE->set_context($context);
-$PAGE->set_pagelayout('incourse');
+$PAGE->set_pagelayout('report');
 $PAGE->set_url('/blocks/configurable_reports/editplugin.php', ['id' => $id, 'comp' => $comp, 'cid' => $cid, 'pname' => $pname]);
 
     $cdata = null;

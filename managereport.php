@@ -112,13 +112,13 @@ if ($reports) {
         get_string('name'),
         get_string('tag'),
         get_string('reportsmanage', 'admin').' '.get_string('course'),
-        get_string('type', 'block_configurable_reports'),
+        //get_string('type', 'block_configurable_reports'),
         get_string('username'),
         get_string('edit'),
         get_string('download', 'block_configurable_reports'),
     ];
-    $table->align = ['left', 'center', 'left', 'left', 'left', 'center', 'center'];
-    $table->size = ['30%', '10%', '10%', '10%', '10%', '20%', '20%'];
+    $table->align = ['left', 'center', 'left', 'left', 'center', 'center'];
+    $table->size = ['30%', '10%', '10%', '10%', '10%', '20%'];
     $stredit = get_string('edit');
     $strdelete = get_string('delete');
     $strhide = get_string('hide');
@@ -179,7 +179,7 @@ if ($reports) {
             $reporttags = core_tag_tag::get_item_tags('block_configurable_reports', 'report', $r->id);
             $report_tags = '';
             foreach ($reporttags as $tag) {
-                $report_tags .= $tag->name . ' ';
+                $report_tags .= html_writer::tag('span',$tag->name, ['class'=>'tag']);
             }
 
         }
@@ -188,7 +188,7 @@ if ($reports) {
             '<a href="viewreport.php?id='.$r->id.'">'.format_string($r->name).'</a>',
             $report_tags,
             $coursename,
-            get_string('report_'.$r->type, 'block_configurable_reports'),
+            //get_string('report_'.$r->type, 'block_configurable_reports'),
             $owner,
             $editcell,
             $download

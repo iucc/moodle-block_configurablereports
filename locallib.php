@@ -129,6 +129,10 @@ function cr_add_jsdatatables($cssid) {
     echo html_writer::script($script);
 }
 
+function cr_use_datatables() {
+
+}
+
 function cr_add_jsordering($cssid) {
     global $DB, $CFG, $OUTPUT;
 
@@ -672,4 +676,27 @@ function cr_logging_info() {
     }
 
     return array($uselegacyreader, $useinternalreader, $logtable);
+}
+
+/**
+ * Returns reports tagged with a specified tag.
+ *
+ * This is a callback used by the tag area block_configurable_reports/report to search for reports
+ * tagged with a specific tag.
+ *
+ * @param core_tag_tag $tag
+ * @param bool $exclusivemode if set to true it means that no other entities tagged with this tag
+ *             are displayed on the page and the per-page limit may be bigger
+ * @param int $fromctx context id where the link was displayed, may be used by callbacks
+ *            to display items in the same context first
+ * @param int $ctx context id where to search for records
+ * @param bool $rec search in subcontexts as well
+ * @param int $page 0-based number of page being displayed
+ * @return \core_tag\output\tagindex
+ */
+function block_configurable_reports_get_tagged_entries($tag, $exclusivemode = false, $fromctx = 0, $ctx = 0, $rec = 1, $page = 0) {
+    global $OUTPUT;
+    //mod/glossary/locallib.php:655
+
+    return ;
 }

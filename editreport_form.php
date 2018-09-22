@@ -134,6 +134,14 @@ class report_edit_form extends moodleform {
             $mform->setType('courseid', PARAM_INT);
         }
 
+        if (core_tag_tag::is_enabled('block_configurable_reports', 'report')) {
+            //((empty($course->id) && guess_if_creator_will_have_course_capability('moodle/course:tag', $categorycontext))
+            //    || (!empty($course->id) && has_capability('moodle/course:tag', $coursecontext)))) {
+            $mform->addElement('header', 'tagshdr', get_string('tags', 'tag'));
+            $mform->addElement('tags', 'tags', get_string('tags'),
+                array('itemtype' => 'report', 'component' => 'block_configurable_reports'));
+        }
+
         // Buttons.
         $this->add_action_buttons(true, get_string('add'));
     }

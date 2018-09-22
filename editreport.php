@@ -116,9 +116,9 @@ if (($show || $hide) && confirm_sesskey()) {
     }
     $action = ($visible) ? 'showed' : 'hidden';
     //cr_add_to_log($report->courseid, 'configurable_reports', 'report '.$action, '/block/configurable_reports/editreport.php?id='.$report->id, $report->id);
-    if ($action == 'showed')
+    if ($action === 'showed')
         \block_configurable_reports\event\report_showed::create_from_report($report, context_course::instance($course->id))->trigger();
-    if ($action == 'hidden')
+    if ($action === 'hidden')
         \block_configurable_reports\event\report_hidden::create_from_report($report, context_course::instance($course->id))->trigger();
 
     header("Location: $CFG->wwwroot/blocks/configurable_reports/managereport.php?courseid=$courseid");
@@ -126,7 +126,7 @@ if (($show || $hide) && confirm_sesskey()) {
 }
 
 if ($duplicate && confirm_sesskey()) {
-    $newreport = new stdclass();
+    //$newreport = new stdClass();
     $newreport = $report;
     unset($newreport->id);
     $newreport->name = get_string('copyasnoun').' '.$newreport->name;
@@ -214,6 +214,9 @@ if (!empty($report)) {
             $report->{'export_'.$e} = 1;
         }
     }
+    if (core_tag_tag::is_enabled('block_configurable_reports', 'report')) {
+        $report->tags = core_tag_tag::get_item_tags_array('block_configurable_reports', 'report', $report->id);
+    }
     $editform->set_data($report);
 }
 
@@ -263,13 +266,18 @@ if ($editform->is_cancelled()) {
         $data->components = '';
 
         // Extra check.
-        if ($data->type == 'sql' && !has_capability('block/configurable_reports:managesqlreports', $context)) {
+        if ($data->type === 'sql' && !has_capability('block/configurable_reports:managesqlreports', $context)) {
             print_error('nosqlpermissions');
         }
 
         if (!$lastid = $DB->insert_record('block_configurable_reports', $data)) {
             print_error('errorsavingreport', 'block_configurable_reports');
         } else {
+            // Save Tags
+            if (core_tag_tag::is_enabled('block_configurable_reports', 'report')) {
+                core_tag_tag::set_item_tags('block_configurable_reports', 'report', $lastid, $context, $data->tags);
+            }
+
             //cr_add_to_log($courseid, 'configurable_reports', 'report created', '/block/configurable_reports/editreport.php?id='.$lastid, $data->name);
             \block_configurable_reports\event\report_created::create_from_report($report, context_course::instance($course->id))->trigger();
 
@@ -278,7 +286,7 @@ if ($editform->is_cancelled()) {
         }
     } else {
         //cr_add_to_log($report->courseid, 'configurable_reports', 'edit', '/block/configurable_reports/editreport.php?id='.$id, $report->name);
-        \block_configurable_reports\event\report_edited::create_from_report($report, $context)->trigger();
+        \block_configurable_reports\event\report_edited::create_from_report($report, context_course::instance($course->id))->trigger();
 
         $reportclass = new $reportclassname($data->id);
         $data->type = $report->type;
@@ -286,6 +294,10 @@ if ($editform->is_cancelled()) {
         if (!$DB->update_record('block_configurable_reports', $data)) {
             print_error('errorsavingreport', 'block_configurable_reports');
         } else {
+            // Save Tags
+            if (core_tag_tag::is_enabled('block_configurable_reports', 'report')) {
+                core_tag_tag::set_item_tags('block_configurable_reports', 'report', $report->id, $context, $data->tags);
+            }
             redirect($CFG->wwwroot.'/blocks/configurable_reports/editcomp.php?id='.$data->id.'&comp='.$reportclass->components[0]);
         }
     }

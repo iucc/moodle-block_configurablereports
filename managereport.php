@@ -51,6 +51,12 @@ $PAGE->set_url('/blocks/configurable_reports/managereport.php', array('courseid'
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('incourse');
 
+if (get_config('block_configurable_reports', 'reporttableui') === 'datatables') {
+    $PAGE->requires->css('/blocks/configurable_reports/js/datatables/media/css/jquery.dataTables.css');
+    $PAGE->requires->js('/blocks/configurable_reports/js/datatables/media/js/jquery.dataTables.min.js', true);
+    //$PAGE->requires->js('/blocks/configurable_reports/js/datatables/extras/FixedHeader/js/FixedHeader.js', true);
+}
+
 if ($importurl) {
     $c = new \curl();
     if ($data = $c->get($importurl)) {
@@ -100,18 +106,19 @@ $PAGE->requires->js_init_call('M.block_configurable_reports.loadReportCategories
 echo $OUTPUT->header();
 
 if ($reports) {
-    $table = new \stdclass;
+    $table = new \stdClass;
     $table->width = "100%";
     $table->head = [
         get_string('name'),
+        get_string('tag'),
         get_string('reportsmanage', 'admin').' '.get_string('course'),
         get_string('type', 'block_configurable_reports'),
         get_string('username'),
         get_string('edit'),
         get_string('download', 'block_configurable_reports'),
     ];
-    $table->align = ['left', 'left', 'left', 'left', 'center', 'center'];
-    $table->size = ['30%', '10%', '10%', '10%', '20%', '20%'];
+    $table->align = ['left', 'center', 'left', 'left', 'left', 'center', 'center'];
+    $table->size = ['30%', '10%', '10%', '10%', '10%', '20%', '20%'];
     $stredit = get_string('edit');
     $strdelete = get_string('delete');
     $strhide = get_string('hide');
@@ -166,8 +173,20 @@ if ($reports) {
             }
         }
 
+        if (core_tag_tag::is_enabled('block_configurable_reports', 'report')) {
+            //$report_tags = $OUTPUT->tag_list(
+            //    core_tag_tag::get_item_tags('block_configurable_reports', 'report', $r->id), null, 'report-tags');
+            $reporttags = core_tag_tag::get_item_tags('block_configurable_reports', 'report', $r->id);
+            $report_tags = '';
+            foreach ($reporttags as $tag) {
+                $report_tags .= $tag->name . ' ';
+            }
+
+        }
+
         $table->data[] = [
             '<a href="viewreport.php?id='.$r->id.'">'.format_string($r->name).'</a>',
+            $report_tags,
             $coursename,
             get_string('report_'.$r->type, 'block_configurable_reports'),
             $owner,
@@ -177,13 +196,20 @@ if ($reports) {
     }
 
     $table->id = 'reportslist';
-    cr_add_jsordering("#reportslist");
+    if (get_config('block_configurable_reports', 'reporttableui') === 'datatables') {
+        cr_add_jsdatatables('#reportslist');
+    } else {
+        cr_add_jsordering("#reportslist");
+    }
+
     cr_print_table($table);
 } else {
     echo $OUTPUT->heading(get_string('noreportsavailable', 'block_configurable_reports'));
 }
 
-echo $OUTPUT->heading('<div class="addbutton"><a class="linkbutton" href="'.$CFG->wwwroot.'/blocks/configurable_reports/editreport.php?courseid='.$course->id.'">'.(get_string('addreport', 'block_configurable_reports')).'</a></div>');
+echo $OUTPUT->heading('<div class="addbutton"><a class="linkbutton" href="'.
+    $CFG->wwwroot.'/blocks/configurable_reports/editreport.php?courseid='.$course->id.'">'.
+    (get_string('addreport', 'block_configurable_reports')).'</a></div>');
 
 
 // Repository report import.

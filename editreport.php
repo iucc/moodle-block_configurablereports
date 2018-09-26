@@ -279,6 +279,8 @@ if ($editform->is_cancelled()) {
             }
 
             //cr_add_to_log($courseid, 'configurable_reports', 'report created', '/block/configurable_reports/editreport.php?id='.$lastid, $data->name);
+            $report = new \stdClass();
+            $report->id = $lastid;
             \block_configurable_reports\event\report_created::create_from_report($report, context_course::instance($course->id))->trigger();
 
             $reportclass = new $reportclassname($lastid);

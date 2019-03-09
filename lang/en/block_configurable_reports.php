@@ -339,6 +339,9 @@ $string['categories'] = 'Categories';
 $string['parentcategory'] = 'Parent category';
 $string['filtercategories'] = 'Filter categories';
 $string['filtercategories_summary'] = 'To filter by category';
+$string['categoriesmulti'] = 'Categories (Multi)';
+$string['filtercategoriesmulti'] = 'Filter categories (Multi select)';
+$string['filtercategoriesmulti_summary'] = 'To filter by category (Multi select) %%FILTER_CATEGORIESMULTI:table.field%%';
 
 $string['includesubcats'] = 'Include subcategories';
 
